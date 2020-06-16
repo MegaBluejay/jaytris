@@ -46,7 +46,8 @@ clock = pg.time.Clock()
 DOWNCLOCK,CLEARCLOCK = range(USEREVENT,USEREVENT+2)
 pg.time.set_timer(DOWNCLOCK,300)
 font = pg.font.Font(None,20)
-pg.key.set_repeat(225)
+pg.key.set_repeat(150,100)
+pause = 0
 
 while 1:
     for event in pg.event.get():
@@ -66,10 +67,15 @@ while 1:
                     pass
                 mino = field.spawn()
                 if field.need_clear():
-                    pg.time.set_timer(CLEARCLOCK, 100)
+                    pg.time.set_timer(CLEARCLOCK, 200)
+            elif event.key==K_ESCAPE:
+                while not ((e:=pg.event.wait()).type==KEYDOWN and e.key==K_ESCAPE):
+                    pass
         elif event.type==DOWNCLOCK:
             if not mino.down():
                 mino = field.spawn()
+                if field.need_clear():
+                    pg.time.set_timer(CLEARCLOCK, 100)
         elif event.type==CLEARCLOCK:
             pg.time.set_timer(CLEARCLOCK,0)
             field.clear()
