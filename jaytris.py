@@ -25,10 +25,20 @@ def draw_empty():
         pg.draw.line(main_game,white,(i*cell_size,0),(i*cell_size,20*cell_size),2)
     for i in range(21):
         pg.draw.line(main_game,white,(0,i*cell_size),(10*cell_size,i*cell_size),2)
+def draw_empty_peek():
+    sidebar.fill(white)
+    for i in range(5):
+        pg.draw.line(sidebar,black,(i*cell_size,0),(i*cell_size,4*cell_size),2)
+    for i in range(5):
+        pg.draw.line(sidebar,black,(0,i*cell_size),(4*cell_size,i*cell_size),2)
+        
 
 def fill_cell(x,y,c):
     return pg.draw.rect(main_game,c,pg.Rect(x*cell_size+line_width,(19-y)*cell_size+line_width,
                                             cell_size-line_width,cell_size-line_width))
+def fill_cell_peek(x,y,c):
+    return pg.draw.rect(sidebar,c,pg.Rect(x*cell_size+line_width,(3-y)*cell_size+line_width,
+                                          cell_size-line_width,cell_size-line_width))
 
 field = Field()
 mino = field.spawn()
@@ -36,6 +46,7 @@ clock = pg.time.Clock()
 DOWNCLOCK,CLEARCLOCK = range(USEREVENT,USEREVENT+2)
 pg.time.set_timer(DOWNCLOCK,300)
 font = pg.font.Font(None,20)
+pg.key.set_repeat(225)
 
 while 1:
     for event in pg.event.get():
@@ -66,10 +77,19 @@ while 1:
     if not mino.ok:
         sys.exit()
 
+    draw_empty_peek()
+    for i in range(4):
+        for j in range(4):
+            c = field.peek_field.get(i,j).value
+            if c==black:
+                c=white
+            fill_cell_peek(i,j,c)
+
+
     clock.tick(60)
-    sidebar.fill(white)
     fps = font.render(str(round(clock.get_fps())),True,black)
-    sidebar.blit(fps,(0,0))
+    fps_rect = fps.get_rect(bottomleft=sidebar.get_rect().bottomleft)
+    sidebar.blit(fps,fps_rect)
 
     draw_empty()
     for i in range(10):

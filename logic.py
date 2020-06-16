@@ -49,18 +49,22 @@ class Tile(Enum):
     E,I,O,T,S,Z,J,L = map(color,colors)
 
 class Tetromino:
-    def __init__(self,typ,field):
+    def __init__(self,typ,field,zero=None):
         self.typ = typ
         self.field = field
         self.rot = 0
+        self.zero=zero
         if typ=='I':
-            self.zero = 3,18
+            if not zero:
+                self.zero = 3,18
             self.pos = trans4(positions['I'][0], self.zero)
         elif typ=='O':
-            self.zero = 4,20
+            if not zero:
+                self.zero = 4,20
             self.pos = trans4(positions['O'][0], self.zero)
         else:
-            self.zero = 3,19
+            if not zero:
+                self.zero = 3,19
             self.pos = trans4(positions[typ][0], self.zero)
 
         field.put(self)
@@ -102,6 +106,7 @@ class Field:
         self.field = [[Tile.E for j in range(22)] for i in range(10)]
         self.bag = self.generate_bag()
         self.mino = None
+        self.peek_field = None
 
     def get(self,x,y):
         return self.field[x][y]
@@ -116,6 +121,8 @@ class Field:
         self.mino = Tetromino(self.bag.pop(),self)
         if not self.bag:
             self.bag = self.generate_bag()
+        self.peek_field = PeekField(self.bag[-1])
+
         return self.mino
 
     def put(self,mino):
@@ -154,3 +161,7 @@ class Field:
                 self.mino.zero = trans(self.mino.zero,(0,-1))
             else:
                 y+=1
+class PeekField(Field):
+    def __init__(self,typ):
+        self.field = [[Tile.E for j in range(4)] for i in range(4)]
+        Tetromino(typ,self,(0,0))
